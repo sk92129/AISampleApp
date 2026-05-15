@@ -8,7 +8,12 @@
 
 /* Begin PBXFileReference section */
 		14ADCEFB2FB6984C002FAAB3 /* AISampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AISampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		14ADCF0B2FB6984D002FAAB3 /* CoreML.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreML.framework; path = System/Library/Frameworks/CoreML.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
+
+/* Begin PBXBuildFile section */
+		14ADCF0C2FB6984D002FAAB3 /* CoreML.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 14ADCF0B2FB6984D002FAAB3 /* CoreML.framework */; };
+/* End PBXBuildFile section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		14ADCEFD2FB6984C002FAAB3 /* AISampleApp */ = {
@@ -23,6 +28,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				14ADCF0C2FB6984D002FAAB3 /* CoreML.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
