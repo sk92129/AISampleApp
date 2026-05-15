@@ -6,50 +6,85 @@
 //
 
 import SwiftUI
-import SwiftData
+import UniformTypeIdentifiers
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    @State private var isImporting = false
+    @State private var selectedFileURL: URL?
+    @State private var selectedFileName = ""
+    @State private var importMessage: String?
 
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
-                    }
-                }
-                .onDelete(perform: deleteItems)
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
-            }
-        } detail: {
-            Text("Select an item")
-        }
-    }
+        NavigationStack {
+            VStack(spacing: 24) {
+                Image(systemName: "doc.text")
+                    .font(.system(size: 48))
+                    .foregroundStyle(.secondary)
 
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
+                Text("Baby names")
+                    .font(.title2.weight(.semibold))
 
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
+                Text("Select babyNames.csv from Files or On My iPhone.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+
+                Button {
+                    isImporting = true
+                } label: {
+                    Label("Select File", systemImage: "folder")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                }
+                .buttonStyle(.borderedProminent)
+
+                if !selectedFileName.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Selected file")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Text(selectedFileName)
+                            .font(.body.monospaced())
+                            .textSelection(.enabled)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding()
+                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+                }
+
+                if let importMessage {
+                    Text(importMessage)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+
+                Spacer()
+            }
+            .padding()
+            .navigationTitle("AISampleApp")
+            .fileImporter(
+                isPresented: $isImporting,
+                allowedContentTypes: [.commaSeparatedText, .plainText],
+                allowsMultipleSelection: false
+            ) { result in
+                importMessage = nil
+                switch result {
+                case .success(let urls):
+                    guard let url = urls.first else { return }
+                    selectedFileURL = url
+                    selectedFileName = url.lastPathComponent
+                    if url.lastPathComponent.lowercased() == "babynames.csv" {
+                        importMessage = "babyNames.csv is ready to use."
+                    } else {
+                        importMessage = "For this sample, choose a file named babyNames.csv."
+                    }
+                case .failure(let error):
+                    selectedFileURL = nil
+                    selectedFileName = ""
+                    importMessage = error.localizedDescription
+                }
             }
         }
     }
@@ -57,5 +92,4 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
 }
